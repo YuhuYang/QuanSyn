@@ -178,8 +178,8 @@ class DependencyAnalyzer():
             mdd = sum(dds) / len(dds)
             sent_length = len(levels)
             vk = (sum(i*2 for i in valencies)/sent_length) - (2 - 2/sent_length)**2
-            sent_data['mdd'] = mdd
-            sent_data['mhd'] = sum(levels)/len(levels)
+            sent_data['dd'] = dds
+            sent_data['hd'] = levels
             sent_data['sent_length'] = sent_length
             sent_data['tree_height'] = max(levels)
             sent_data['tree_width'] = levels.count(max(levels, key=levels.count))
@@ -187,8 +187,8 @@ class DependencyAnalyzer():
             sents_info.append(sent_data)
         
         if target=='text':
-            mdd = sum([i['mdd'] for i in sents_info])/len(sents_info)
-            mhd = sum([i['mhd'] for i in sents_info])/len(sents_info) 
+            #mdd = sum([i['mdd'] for i in sents_info])/len(sents_info)
+            #mhd = sum([i['mhd'] for i in sents_info])/len(sents_info) 
             senlen = sum([i['sent_length'] for i in sents_info])/len(sents_info)
             tree_hei = sum([i['tree_height'] for i in sents_info])/len(sents_info)
             tree_wid = sum([i['tree_width'] for i in sents_info])/len(sents_info)
