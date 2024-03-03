@@ -1,24 +1,8 @@
-###indicators form dependency grammar and valency grammar,such as dependency distance, dependency direction, 
-###probabilistic valency pattern, valency and so on.###
 from conllu import parse_incr
 from collections import Counter
 
 class DependencyAnalyzer():
-    """
-    An analyzer for dependency.
-    
-    :Items: mean dependency distance(mdd), dependency distance distribution(dd_distribution),
-            proportion of dependency directions(pdd), 
-            mean hierarchical distance(mhd), hierarchical distance distribution(hd_distribution),
-            tree height and tree width(tree),
-            describe(mdd,mhd,pdd,tree_hei,tree_wid,vk)
-    """
     def __init__(self,data):
-        """
-        :data: must be conllu format or other byte-like formats, which means annotated
-               such as, f = open(r'treebank.conllu',encoding='utf-8').read()
-                        DenpendencyAnalyzer(f)
-        """
         self.data = list(parse_incr(data))
         
     def _pos_condition(self,word, pos):
@@ -42,25 +26,10 @@ class DependencyAnalyzer():
         return conditions
     
     def mdd(self,pos=None,dependency=None,direction=None):
-        """
-        These three paras can specialize the items you want.
-        :pos: str
-        :dependency: str
-        :direction: str
-                    'hi' - head final
-                    'hf' - hean initial
-        :return: mdd(float)
-        :About mdd: 
-               Liu H. Dependency distance as a metric of language comprehension difficulty[J]. 
-                 Journal of Cognitive Science, 2008, 9(2): 159-191.  
-        :example:
-              dep = DenpendencyAnalyzer(conllu)
-              dep.mdd()
-              dep.mdd(pos='NOUN')
-        """
         dds = self.dd_distribution(pos,dependency,direction)
         MDD = sum(dds) / len(dds)
         return MDD    
+    
     def dd_distribution(self,pos=None,dependency=None,direction=None):
         dds = []
         for sentence in self.data:    
@@ -72,17 +41,6 @@ class DependencyAnalyzer():
         return dds      
     
     def pdd(self,pos=None,dependency=None):
-        """
-        :return: dict -> (proportion of head final, proportion of head initial)
-        :About dependency direction:
-              Liu-Directionalities
-              Liu H. Dependency direction as a means of word-order typology: A method based on dependency treebanks[J].
-                Lingua, 2010, 120(6): 1567-1578.
-        :example:
-              dep = DenpendencyAnalyzer(conllu)
-              dep.pdd()
-        
-        """
         head_initial = 0
         head_final = 0
         for sentence in self.data:    
@@ -97,19 +55,14 @@ class DependencyAnalyzer():
         total = head_initial + head_final
         proportion_head_initial = head_initial / total
         proportion_head_final = head_final / total
-        pdd = {'head final':proportion_head_final,'head_initial':proportion_head_initial}
+        pdd = {'head final':proportion_head_final,'head initial':proportion_head_initial}
         return  pdd
     
     def mhd(self, pos=None,dependency=None):
-        """
-        About mean hierarchical distance:
-             Jing Y, Liu H. Mean hierarchical distance augmenting mean dependency distance[C]//
-               Proceedings of the third international conference on dependency linguistics 
-               (Depling 2015). 2015: 161-170.
-        """
         hds = self.hd_distribution(pos,dependency)
         MHD = sum(hds)/len(hds)
         return MHD
+    
     def hd_distribution(self, pos=None,dependency=None):
         hds = []
         for sentence in self.data:
@@ -125,17 +78,12 @@ class DependencyAnalyzer():
         return hds    
 
     def tree(self,pos=None,dependency=None):        
-        """
-        About tree height and tree width:
-             Hongxin Zhang & Haitao Liu. (2018). Interrelations among dependency tree widths, 
-               heights and sentence lengths. In: Haitao Liu & Jingyang Jiang (eds.). 
-               Quantitative Analysis of Dependency Structure. Berlin/Boston: DE GRUYTER MOUTON.
-        """
         tree_indicators = self.tree_distribution(pos,dependency)
         tree_height = tree_indicators['height']
         tree_width = tree_indicators['width']
         tree = {'height':sum(tree_height)/len(tree_height),'width':sum(tree_width)/len(tree_width)}
         return tree
+    
     def tree_distribution(self,pos=None,dependency=None):
         height = []
         width = []
@@ -165,19 +113,21 @@ class DependencyAnalyzer():
             valencies = []
             word_index_by_id = {word['id']: word for word in sentence}
             for word in sentence:
-                if word['deprel'] != 'punct':
+                if word['deprel'] not in['punct','root']:
                     dd = abs(word['head'] - word['id'])
                     dds.append(dd)
-                valencies.append(len([i for i in sentence if i['head'] == word['id']]))
-                depth = 0        
-                head_id = word['head']
-                while head_id != 0:
-                    depth += 1
-                    head_id = word_index_by_id[head_id]['head']
-                levels.append(depth)
-            mdd = sum(dds) / len(dds)
-            sent_length = len(levels)
-            vk = (sum(i*2 for i in valencies)/sent_length) - (2 - 2/sent_length)**2
+                    depth = 0        
+                    head_id = word['head']
+                    while head_id != 0:
+                        depth += 1
+                        head_id = word_index_by_id[head_id]['head']
+                    levels.append(depth)
+                    k = len([i for i in sentence if i['head'] == word['id'] and i['deprel'] is not 'punct'])+1
+                if word['deprel'] is 'root':
+                    k = len([i for i in sentence if i['head'] == word['id'] and i['deprel'] is not 'punct'])
+                valencies.append(k)
+            sent_length = len(levels)+1
+            vk = (sum(i**2 for i in valencies)/sent_length) - (2 - 2/sent_length)**2
             sent_data['dd'] = dds
             sent_data['hd'] = levels
             sent_data['sent_length'] = sent_length
@@ -187,8 +137,8 @@ class DependencyAnalyzer():
             sents_info.append(sent_data)
         
         if target=='text':
-            #mdd = sum([i['mdd'] for i in sents_info])/len(sents_info)
-            #mhd = sum([i['mhd'] for i in sents_info])/len(sents_info) 
+            mdd = sum([sum(i['dd']) for i in sents_info])/sum([len(i['dd']) for i in sents_info])
+            mhd = sum([sum(i['hd']) for i in sents_info])/sum([len(i['hd']) for i in sents_info])
             senlen = sum([i['sent_length'] for i in sents_info])/len(sents_info)
             tree_hei = sum([i['tree_height'] for i in sents_info])/len(sents_info)
             tree_wid = sum([i['tree_width'] for i in sents_info])/len(sents_info)
@@ -199,13 +149,21 @@ class DependencyAnalyzer():
         
         if target=='sentence':
             return sents_info
+        
+def getDepFeatures(conllu):
+    dep = DependencyAnalyzer(conllu)
+    featuredict = {}
+    featuredict['mdd'] = dep.mdd()
+    featuredict['mhd'] = dep.mhd()
+    featuredict['dd distribution'] = dep.dd_distribution()
+    featuredict['hd distribution'] = dep.hd_distribution()
+    featuredict['pdd'] = dep.pdd()
+    featuredict['tree'] = dep.tree()
+    featuredict['tree distribution'] = dep.tree_distribution()
+    return featuredict
 
 class ValencyAnalyzer():
-    """
-    A class for analyzing valency.
-    
-    :data: must be conllu format or other byte-like formats, which means annotated corpus(treebanks). 
-    """
+
     def __init__(self, data):
         self.data = list(parse_incr(data))
 
@@ -257,3 +215,11 @@ class ValencyAnalyzer():
         govs = Counter(governors)
         pvp = {'act as a gov':deps,'act as a dep':govs}
         return pvp
+
+def getValFeatures(conllu):
+    val = ValencyAnalyzer(conllu)
+    featuredict = {}
+    featuredict['mean valency'] = val.mean_valency()
+    featuredict['valency distribution'] = val.distribution()
+    featuredict['probablistic valency pattern'] = val.PVP()
+    return featuredict
