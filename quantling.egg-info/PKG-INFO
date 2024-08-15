@@ -1,0 +1,43 @@
+Metadata-Version: 2.1
+Name: quantling
+Version: 0.0.1
+Summary: A package for quantiative linguistics
+Home-page: https://github.com/YuhuYang/QuantLing
+Author: Mu Yang
+Author-email: yuhuyang@163.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# QuantLing
+QuantLing：A python package for Quantitative Linguistics.
+Now in developing!!!
+This package is consisted of four main parts:
+- `depval.py`: some common indicators about dependency grammar and valency grammar.
+- `lawfitter.py`: a small fitter for laws in QL.
+- `lingnet.py`: a module for complex network construction.
+- `quita.py`:  indicators in text analysis listed by software Quantitative Index Text Analyzer (QUITA)
+---
+## depval
+**depval** has two analyzers:
+- DependencyAnalyzer:
+    - mean dependency distance (mdd)
+    - dependency distance distribution（dd）
+    - 
+    - 
+- ValencyAnalyzer:
+    
+## lingnet
+**lingnet** has three analyzers:
+- Network:
+    - mean dependency distance (mdd)
+    - dependency distance distribution（dd）
+    - 
+    - 
+- Hypergraph:
+    - -
+- PowerLawfitter
+
