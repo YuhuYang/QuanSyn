@@ -129,7 +129,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-- GitHub: [username](https://github.com/YuhuYang)
+- GitHub: [YuhuYang](https://github.com/YuhuYang)
 - Email: yangmufy@163.com
 
 ## acknowledgements
