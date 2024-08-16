@@ -44,9 +44,9 @@ dep = DependencyAnalyzer(data)
 # dependency distance distribution
 dep.dd_distribution()
 # mean dependency distance of specific wordclasses
-dep.mdd(upos='NOUN')
+dep.mdd(pos='NOUN')
 # mean dependency distance of specific dependency relations
-dep.mdd(depedency='subj')
+dep.mdd(dependency='subj')
 # proportion of dependency distance
 dep.pdd()
 # tree width and tree depth
