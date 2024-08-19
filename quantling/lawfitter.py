@@ -1,4 +1,6 @@
-###A Fitter for Laws in Quantitative Linguitics###
+#!/usr/bin/env python
+# coding: utf-8
+
 import numpy as np
 from scipy import optimize as op
 import math

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 from collections import Counter 
 import numpy as np
 from scipy.optimize import curve_fit
