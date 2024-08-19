@@ -62,7 +62,7 @@ dv.pvp()
 ```
 or:
 ```bash
-dv = getDepFeatures(data)
+dv = getDepValFeatures(data)
 print(dv)
 ```
 
