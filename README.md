@@ -1,5 +1,5 @@
 # QuantLing
-QuantLing：A python package for Quantitative Linguistics.
+QuantLing：A python package for quantitative syntax analysis.
 
 
 [![PyPI version](https://badge.fury.io/py/PackageName.svg)](https://badge.fury.io/py/PackageName)
@@ -8,9 +8,9 @@ QuantLing：A python package for Quantitative Linguistics.
 
 ## Description
 
-`QuantLing` is a Python library for Quantitative Linguistics. It provides functionality to quantify linguistic structures and explore language patterns.
+`QuantLing` is a Python package for Quantitative Linguistics. It provides functionality to quantify linguistic structures and explore language patterns.
 
-This package is consisted of four main parts:
+This package is consisted of three main parts:
 - `depval.py`: some indicators about dependency structures and valency structures.
 - `lawfitter.py`: a small fitter for some laws in QL.
 - `lingnet.py`: a module for complex network construction.
@@ -35,45 +35,35 @@ pip install nltk conllu
 Here's a simple example of how to use `QuantLing`:
 
 ### 1. depval
-**DependencyAnalyzer** : some indicators about dependency structures.
 ```bash
-from quantling.depval import DependencyAnalyzer   
+from quantling.depval import DepValAnalyzer   
 data = open(r'your_treebank.conllu',encoding='utf-8')
-dep = DependencyAnalyzer(data) 
+dv = DependencyAnalyzer(data) 
 
 # dependency distance distribution
-dep.dd_distribution()
+dv.dd_distribution()
 # mean dependency distance of specific wordclasses
-dep.mdd(pos='NOUN')
+dv.mdd(pos='NOUN')
 # mean dependency distance of specific dependency relations
-dep.mdd(dependency='subj')
+dv.mdd(dependency='nsubj')
 # proportion of dependency distance
-dep.pdd()
+dv.pdd()
 # tree width and tree depth
-dep.tree()
+dv.tree()
 # tree width distirbution and tree depth distribution
-dep.tree_distribution()
-```
-
-**ValencyAnalyzer** : some indicators about valency structures.
-```bash
-from quantling.depval import ValencyAnalyzer   
-data = open(r'your_treebank.conllu',encoding='utf-8')
-val = ValencyAnalyzer(data) 
+dv.tree_distribution()
 
 # mean valency
-val.mean_valency()
+dv.mean_valency()
 # valency distribution
-val.distribution()
+dv.valency_distribution()
 # probalistic valency pattern 
-val.PVP()
+dv.pvp()
 ```
 or:
 ```bash
-dep = getDepFeatures(data)
-val = getValFeatures(data)
-print(dep)
-print(val)
+dv = getDepFeatures(data)
+print(dv)
 ```
 
 ### 2. lawfitter
@@ -129,10 +119,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-- GitHub: [YuhuYang](https://github.com/YuhuYang)
+- GitHub: [@YuhuYang](https://github.com/YuhuYang)
 - Email: yangmufy@163.com
 
-## acknowledgements
+## Citing
 
 If our project has been helpful to you, please give it a star and cite our articles. We would be very grateful.
 
