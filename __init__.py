@@ -1,2 +1,2 @@
-__all__ = ["depval"]
-__version__ = "0.0.1"
+__all__ = ["depval","lawfitter","lingnet"]
+__version__ = "0.1.1"

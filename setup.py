@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
  
 setuptools.setup(
     name="quantling", 
-    version="0.1.0",   
+    version="0.1.1",   
     author="Mu Yang",    
     author_email="yuhuyang@163.com",   
     description="A package for quantiative linguistics",
