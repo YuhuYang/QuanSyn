@@ -1,4 +1,4 @@
-# QuantLing
+# QuanSyn
 QuanSyn：A python package for quantitative syntax analysis.
 
 
