@@ -1,5 +1,5 @@
 # QuantLing
-QuantLing：A python package for quantitative syntax analysis.
+QuanSyn：A python package for quantitative syntax analysis.
 
 
 [![PyPI version](https://badge.fury.io/py/PackageName.svg)](https://badge.fury.io/py/PackageName)
