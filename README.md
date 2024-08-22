@@ -1,5 +1,5 @@
-# QuanSyn
-QuanSyn：A python package for quantitative syntax analysis.
+# QuantLing
+QuantLing：A python package for quantitative syntax analysis.
 
 
 [![PyPI version](https://badge.fury.io/py/PackageName.svg)](https://badge.fury.io/py/PackageName)
@@ -8,7 +8,7 @@ QuanSyn：A python package for quantitative syntax analysis.
 
 ## Description
 
-`QuanSyn` is a Python package for Quantitative Linguistics. It provides functionality to quantify linguistic structures and explore language patterns.
+`QuantLing` is a Python package for Quantitative Linguistics. It provides functionality to quantify linguistic structures and explore language patterns.
 
 This package is consisted of three main parts:
 - `depval.py`: some indicators about dependency structures and valency structures.
@@ -18,10 +18,10 @@ This package is consisted of three main parts:
 
 ## Installation
 
-You can install `QuanSyn` via pip:
+You can install `QuantLing` via pip:
 
 ```bash
-pip install quansyn
+pip install quantling
 ```
 
 `nltk` and `conllu` are required.
@@ -32,11 +32,11 @@ pip install nltk conllu
 
 ## Quick Start
 
-Here's a simple example of how to use `QuanSyn`:
+Here's a simple example of how to use `QuantLing`:
 
 ### 1. depval
 ```bash
-from quansyn.depval import DepValAnalyzer   
+from quantling.depval import DepValAnalyzer   
 data = open(r'your_treebank.conllu',encoding='utf-8')
 dv = DependencyAnalyzer(data) 
 
@@ -62,14 +62,14 @@ dv.pvp()
 ```
 or:
 ```bash
-dv = getDepValFeatures(data)
+dv = getDepFeatures(data)
 print(dv)
 ```
 
 ### 2. lawfitter
 
 ```bash
-from quansyn.lawfitter import fit   
+from quantling.lawfitter import fit   
 #results = fit(data,model,variant)
 results = fit([[1,2,3,4,5,6],[3,4,2,6,8,15]],'zipf')
 print(resluts)
@@ -78,7 +78,7 @@ print(resluts)
 ### 3. lingnet
 
 ```bash
-from quansyn.lingnet import conllu2edge
+from quantling.lingnet import conllu2edge
 import networkx as nx   
 # use a conllu file to construction a network
 data = open(r'your_treebank.conllu',encoding='utf-8')
