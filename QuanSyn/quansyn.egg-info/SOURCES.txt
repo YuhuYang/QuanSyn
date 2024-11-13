@@ -1,0 +1,12 @@
+LICENSE
+README.md
+setup.py
+quansyn/__init__.py
+quansyn/depval.py
+quansyn/lawfitter.py
+quansyn/lingnet.py
+quansyn.egg-info/PKG-INFO
+quansyn.egg-info/SOURCES.txt
+quansyn.egg-info/dependency_links.txt
+quansyn.egg-info/requires.txt
+quansyn.egg-info/top_level.txt
