@@ -319,7 +319,7 @@ converter.save(converted_treebank, 'pmt', 'output_path/to/treebank.txt')
 ### Example 7: Building a Linguistic Network
 
 ```python
-from quansyn.lingnet import load_edges
+from quansyn.lingnet import conllu2edge
 import networkx as nx
 
 # Load the treebank
