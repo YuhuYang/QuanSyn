@@ -317,7 +317,7 @@ converter.save(converted_treebank, 'pmt', 'output_path/to/treebank.txt')
 ### 示例 7：搭建语言网络
 
 ```python
-from quansyn.lingnet import load_edges
+from quansyn.lingnet import conllu2edge
 import networkx as nx
 
 # 加载树库
@@ -326,7 +326,7 @@ treebank = open(treebank_path, encoding='utf-8')
 
 # 抽取依存关系为边，如果想抽取同现关系，将mode设置为'adjacency'
 # edges 为边列表，每个元素为 (head, dependent)
-edges = conllu2edges(treebank, mode='dependency')
+edges = conllu2edge(treebank, mode='dependency')
 
 # 构建网络，网络指标可以通过networkx计算
 G = nx.graph(edges)
