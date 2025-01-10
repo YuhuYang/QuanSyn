@@ -5,9 +5,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
  
 setuptools.setup(
     name="quansyn", 
-    version="0.0.6",   
+    version="0.0.9",   
     author="Mu Yang",    
-    author_email="yuhuyang@163.com",   
+    author_email="yangmufy@163.com",   
     description="A package for quantitative syntax analysis",
     long_description=long_description,    
     long_description_content_type="text/markdown",
