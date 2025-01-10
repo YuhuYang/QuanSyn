@@ -1,23 +1,29 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+#!/usr/bin/env python
+# coding: utf-8
+
 import pandas as pd
 from conllu import parse_incr
 from collections import Counter
 import os
+import time
 
 from collections import Counter,defaultdict
 from typing import List, Dict, Optional, Tuple, Any
 
 __all__ = ['DepValAnalyzer','analyze','Converter','convert']
 
-rootdeps = ['root','ROOT','s','HED']
-stopdeps = ['punct','punkt','_','PUN']
+punctdeps = ['punkt','punct','pu','PU','PUN']
+rootdeps = ['root','ROOT','s','HED','']
+stopdeps = ['punct','punkt','_','PUN','PU','pu']
 
 class DepValAnalyzer:
 
     def __init__(self, treebank):
-        self.treebank = list(parse_incr(treebank))
+        self.raw = list(parse_incr(treebank))
+        self.treebank = self.preprocessing()
         self.dep_metrics = ['dd','hd','ddir','v']
         self.sent_metrics = ['mdd','mhd','mhdd','tdl','sl','mv','vk','tw','th','hi','hf']
         self.text_metrics = ['mdd','mhd','mhdd','mtdl','msl','mv','vk','mtw','mth','hi','hf']
@@ -25,25 +31,46 @@ class DepValAnalyzer:
         self.projection = {'mdd':'dd','mhd':'hd','mhdd':'hd','mtdl':'dd','msl':'id','mv':'v','vk':'v',
                            'mtw':'hd','mth':'hd','hi':'ddir','hf':'ddir','pos':'dpos','deprel':'deprel'}
 
-    def _dd(self,word: Dict[str, Any])->List:
+    def preprocessing(self):
+        cleaned_treebank = []
+        for sentence in self.raw:
+            cleaned_sentence = []
+            punkt_id = [word['id'] for word in sentence if word['deprel'] in punctdeps]
+            clean_id = {word['id']:word['id']-len([i for i in punkt_id if i < word['id']]) for word in sentence if word['deprel'] not in stopdeps}
+            for word in sentence:
+                if word['deprel'] not in stopdeps:
+                    word['id'] = clean_id[word['id']]
+                    word['head'] = clean_id.get(word['head'],0)
+                    cleaned_sentence.append(word)
+            cleaned_treebank.append(cleaned_sentence)
+        return cleaned_treebank  
+
+    def _dd(self,word: Dict[str, Any])->int:
         dd = abs(word['head'] - word['id'])
         return dd
-    
-    def _hd(self,word: Dict[str, Any],word_index_by_id: Dict[int, Dict[str, Any]])->List:
+     
+    def _hd(self,word: Dict[str, Any],word_index_by_id: Dict[int, Dict[str, Any]])->int:
         head_id = word['head']
         hd = 0
         while head_id != 0:
             hd += 1
-            head_id = word_index_by_id[head_id]['head']
+            if head_id not in word_index_by_id.keys():
+                hd = 0
+                break
+            elif head_id in word_index_by_id.keys():
+                head_id = word_index_by_id[head_id]['head']
+            if hd > len(word_index_by_id):
+                hd = 0
+                break
         return hd
     
-    def _ddir(self,word: Dict[str, Any])->List:
+    def _ddir(self,word: Dict[str, Any])->int:
         if word['head'] < word['id']:
             return 1
         elif word['head'] > word['id']:
             return -1
 
-    def _v(self, word: Dict[str, Any],sent: List[Dict[str, Any]]) -> List:
+    def _v(self, word: Dict[str, Any],sent: List[Dict[str, Any]]) -> int:
         v = sum(1 for w in sent if w['head'] == word['id'] and w['deprel'] not in stopdeps) + 1
         if word['head'] == 0:
             v -= 1
@@ -56,11 +83,11 @@ class DepValAnalyzer:
         results = {metric: [] for metric in metrics}
 
         for sent in self.treebank:
-            word_index_by_id = {word['id']: word for word in sent} if 'hd' in metrics else None
+            word_index_by_id = {word['id']: word for word in sent if type(word['id']) != tuple } if 'hd' in metrics or 'dd' in metrics else None
             temp_results = {metric: [] for metric in metrics}
             
             for word in sent:
-                if word['deprel'] not in rootdeps+stopdeps:
+                if word['deprel'] not in rootdeps+stopdeps and word['head'] != 0 and word['upos'] != 'pu':
                     if 'dd' in metrics:
                         temp_results['dd'].append(self._dd(word))  
                     if 'hd' in metrics:
@@ -73,10 +100,16 @@ class DepValAnalyzer:
                     temp_results['form'].append(word['form'])
                     temp_results['dpos'].append(word['upos'])
                     temp_results['head'].append(word['head'])
-                    temp_results['gform'].append(sent[word['head']-1]['form'])
-                    temp_results['gpos'].append(sent[word['head']-1]['upos'])
+                    try:
+                        temp_results['gform'].append(sent[word['head']-1]['form'])
+                    except:
+                        temp_results['gform'].append('ERROR_ANNOTATION')
+                    try:
+                        temp_results['gpos'].append(sent[word['head']-1]['upos'])
+                    except:
+                        temp_results['gpos'].append('ERROR_ANNOTATION')
                     temp_results['deprel'].append(word['deprel'])
-                elif word['deprel'] in rootdeps:
+                elif word['head'] == 0 and word['upos'] not in stopdeps:
                     if 'dd' in metrics:
                         temp_results['dd'].append(0)  
                     if 'hd' in metrics:
@@ -107,8 +140,8 @@ class DepValAnalyzer:
         sent_data = {metric: [] for metric in metrics}
 
         metric_functions = {
-            'mdd': lambda: [sum(i for i in j if i > 0) / (len(j)-1) for j in dep_data['dd']],
-            'mhd': lambda: [sum(i for i in j if i > 0) / (len(j)-1) for j in dep_data['hd']],
+            'mdd': lambda: [sum(i for i in j if i > 0) / max(1, len(j) - 1) for j in dep_data['dd']],
+            'mhd': lambda: [sum(i for i in j if i > 0) / max(1, len(j) - 1) for j in dep_data['hd']],
             'mhdd': lambda: [(len(j)-1) / (max(j)+1) for j in dep_data['hd']],
             'tdl': lambda: [sum(j) for j in dep_data['dd']],
             'sl': lambda: [len(j) for j in dep_data['id']],
@@ -137,8 +170,8 @@ class DepValAnalyzer:
         text_data = {}
         
         metric_calculators = {
-            'mdd': lambda: sum(sum(dep_data['dd'], [])) / (len(sum(dep_data['dd'], []))-len(dep_data['dd'])),
-            'mhd': lambda: sum(sum(dep_data['hd'], [])) / (len(sum(dep_data['hd'], []))-len(dep_data['hd'])),
+            'mdd': lambda: sum(sum(dep_data['dd'], [])) / max(1,(len(sum(dep_data['dd'], []))-len(dep_data['dd']))),
+            'mhd': lambda: sum(sum(dep_data['hd'], [])) / max(1,(len(sum(dep_data['hd'], []))-len(dep_data['hd']))),
             'mhdd': lambda: sum((len(j)-1) / (max(j)+1) for j in dep_data['hd']) / len(dep_data['hd']),
             'mtdl': lambda: sum(sum(j) for j in dep_data['dd']) / len(dep_data['dd']),
             'msl': lambda: sum(len(j) for j in dep_data['dd']) / len(dep_data['dd']),
@@ -148,8 +181,8 @@ class DepValAnalyzer:
             ) / len(dep_data['v']),
             'mtw': lambda: sum(j.count(max(j, key=j.count)) for j in dep_data['hd']) / len(dep_data['hd']),
             'mth': lambda: sum(max(j)+1 for j in dep_data['hd']) / len(dep_data['hd']),
-            'hi': lambda: sum(j.count(1) for j in dep_data['ddir']) / (len(sum(dep_data['ddir'], []))-len(dep_data['ddir'])),
-            'hf': lambda: sum(j.count(-1) for j in dep_data['ddir']) / (len(sum(dep_data['ddir'], []))-len(dep_data['ddir'])),
+            'hi': lambda: sum(j.count(1) for j in dep_data['ddir']) / max(1,(len(sum(dep_data['ddir'], []))-len(dep_data['ddir']))),
+            'hf': lambda: sum(j.count(-1) for j in dep_data['ddir']) / max(1,(len(sum(dep_data['ddir'], []))-len(dep_data['ddir']))),
         }
     
         for metric in metrics:
@@ -233,7 +266,38 @@ class DepValAnalyzer:
             deps = sorted(dependents.items(), key=lambda x: x[1], reverse=True)
         return {'act as a gov': deps, 'act as a dep': govs}
     
-def analyze(treebank_path:str,out_path:str):
+def _pvp2df(pvp):
+    df = pd.DataFrame()
+    gov = dict(pvp['act as a gov'])
+    dep = dict(pvp['act as a dep'])
+    df['Items'] = sorted(list(set(gov.keys()).union(set(dep.keys()))))  
+    df['act as a gov'] = [gov.get(d,0) for d in df['Items']]
+    df['act as a dep'] = [dep.get(d,0) for d in df['Items']]
+    return df
+
+def getDepValFeatures(treebank:list,normalize:bool=True):
+    treebank = DepValAnalyzer(treebank)
+    text_data = treebank.calculate_text_metrics()
+            
+    dep_data = treebank.calculate_dep_metrics()
+    dep_data = {x:sum(y,[]) for x,y in dep_data.items()}
+    dep_data = pd.DataFrame(dep_data)
+
+    sent_data = treebank.calculate_sent_metrics()
+    sent_data = pd.DataFrame(sent_data)  
+
+    pvp_data = treebank.calculate_pvp()
+    pvp_data = _pvp2df(pvp_data)  
+
+    distribution_dict = {}
+    distributions = treebank.calculate_distributions(normalize=normalize)
+    for m in ['dd','hd','sl','v','tw','th','deprel','pos']:
+        data = pd.DataFrame(distributions[m]).T
+        distribution_dict[m] = data
+    
+    return text_data,dep_data,sent_data,pvp_data,distribution_dict
+
+def analyze(treebank_path:str,out_path:str,normalize:bool=True):
 
     if not os.path.splitext(out_path)[1]:
         os.makedirs(out_path,exist_ok=True)
@@ -247,24 +311,16 @@ def analyze(treebank_path:str,out_path:str):
         files = [os.path.join(out_path, f) for f in file_names]
         for i,t in enumerate(treebanks):      
             os.makedirs(files[i],exist_ok=True)     
+            treebank = open(t, encoding='utf-8')
+            text_metrics,dep_metrics,sent_metrics,pvp_metrics,distribution_dict = getDepValFeatures(treebank)
                     
-            treebank = DepValAnalyzer(open(t, encoding='utf-8'))
-            text_data = treebank.calculate_text_metrics()
-            text_csv.loc[i,:] = text_data   
-            
-            dep_data = treebank.calculate_dep_metrics()
-            dep_data = {x:sum(y,[]) for x,y in dep_data.items()}
-            dep_data = pd.DataFrame(dep_data).round(2)
-            dep_data.to_csv(os.path.join(files[i],f'dep_metrics.csv'),index=False)   
+            text_csv.loc[i,:] = text_metrics   
+            dep_metrics.round(2).to_csv(os.path.join(files[i],f'dep_metrics.csv'),index=False)   
+            sent_metrics.round(2).to_csv(os.path.join(files[i],f'sent_metrics.csv'),index=False)   
+            pvp_metrics.round(4).to_csv(os.path.join(files[i],f'pvp.csv'),index=False)    
 
-            sent_data = treebank.calculate_sent_metrics()
-            sent_data = pd.DataFrame(sent_data).round(2)
-            sent_data.to_csv(os.path.join(files[i],f'sent_metrics.csv'),index=False)   
-
-            distributions = treebank.calculate_distributions()
-            for m in ['dd','hd','sl','v','tw','th','deprel','pos']:
-                data = pd.DataFrame(distributions[m]).T
-                data.to_csv(os.path.join(files[i],f'{m}_distribution.csv'),index=False,header=False)   
+            for m in distribution_dict:
+                distribution_dict[m].to_csv(os.path.join(files[i],f'{m}_distribution.csv'),index=False,header=False) 
         
         text_csv = text_csv.astype(float).round(2)
         text_csv['treebank'] = file_names
@@ -445,9 +501,3 @@ def convert(treebank_path:str,out_path:str,style_from:str,style_to:str):
                 converter.save(converted_treebank,style_to,os.path.join(out_path,f'{file_names[i]}.txt'))
     else:
         raise ValueError(f"The input path {treebank_path} is not a valid directory. It should be a directory containing treebank files.")
-
-
-
-        
-
-
