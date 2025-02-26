@@ -370,18 +370,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If our project has been helpful to you, please give it a star and cite our articles. We would be very grateful.
 
 ```
-@article{Yang_2022,
-doi = {10.1209/0295-5075/ac8bf2},
-url = {https://dx.doi.org/10.1209/0295-5075/ac8bf2},
-year = {2022},
-month = {sep},
-publisher = {EDP Sciences, IOP Publishing and Società Italiana di Fisica},
-volume = {139},
-number = {6},
-pages = {61002},
+
+@article{Yang25022025,
 author = {Mu Yang and Haitao Liu},
-title = {The role of syntax in the formation of scale-free language networks},
-journal = {Europhysics Letters},
-abstract = {The overall structure of a network is determined by its micro features, which are different in both syntactic and non-syntactic networks. However, the fact that most language networks are small-world and scale-free raises the question: does syntax play a role in forming the scale-free feature? To answer this question, we build syntactic networks and co-occurrence networks to compare the generation mechanisms of nodes, and to investigate whether syntactic and non-syntactic factors have distinct roles. The results show that frequency is the foundation of the scale-free feature, while syntax is beneficial to enhance this feature. This research introduces a microscopic approach, which may shed light on the scale-free feature of language networks.}
+title = {QuanSyn: A Package for Quantitative Syntax Analysis},
+journal = {Journal of Quantitative Linguistics},
+volume = {0},
+number = {0},
+pages = {1--18},
+year = {2025},
+publisher = {Routledge},
+doi = {10.1080/09296174.2025.2471157},
+
+URL = { 
+        https://doi.org/10.1080/09296174.2025.2471157
+},
+eprint = { 
+        https://doi.org/10.1080/09296174.2025.2471157
+}
 }
 ``` 
