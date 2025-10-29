@@ -47,7 +47,7 @@
     - mdd: Mean Dependency Distance，句内dd的均值。图中句子的mdd为(8+1+1+3+1+1+1+1+1+2+1+1+1+2)/14 = 1.79。
         - $mdd = \frac{1}{sl-1}\sum_{i=1}^{sl-1}dd_i$
         - Liu, H. (2008). Dependency distance as a metric of language comprehension difficulty. Journal of Cognitive Science, 9(2), 159-191.
-    - mhd: Mean Hierarchical Distance，句内hd的均值。图中句子的mhd为(2+5+4+3+4+5+2+2+3+4+4+5+6+6)/14 = 3.93。
+    - mhd: Mean Hierarchical Distance，句内hd的均值。图中句子的mhd为(1+4+3+2+3+4+1+1+2+3+3+4+5+5)/14 = 2.93。
         - $mhd = \frac{1}{sl-1}\sum_{i=1}^{sl-1}hd_i$
         - Jing, Y., & Liu, H. (2015, August). Mean hierarchical distance augmenting mean dependency distance. In Proceedings of the third international conference on dependency linguistics (Depling 2015) (pp. 161-170).
     - mhdd: Mean Hierarchical Dependency Distance，依存关系数量除以句内层级数。图中句子的mhdd为14/6 = 2.33。
@@ -382,3 +382,4 @@ journal = {Europhysics Letters},
 abstract = {The overall structure of a network is determined by its micro features, which are different in both syntactic and non-syntactic networks. However, the fact that most language networks are small-world and scale-free raises the question: does syntax play a role in forming the scale-free feature? To answer this question, we build syntactic networks and co-occurrence networks to compare the generation mechanisms of nodes, and to investigate whether syntactic and non-syntactic factors have distinct roles. The results show that frequency is the foundation of the scale-free feature, while syntax is beneficial to enhance this feature. This research introduces a microscopic approach, which may shed light on the scale-free feature of language networks.}
 }
 ``` 
+
