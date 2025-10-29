@@ -48,7 +48,7 @@ The "level" refers to the subject of the statistical metric, which changes the c
     - mdd: Mean Dependency Distance, the average of all dependency distances in a sentence. The MDD of the sentence in the figure is (8+1+1+3+1+1+1+1+1+2+1+1+1+2)/14 = 1.79.  
         - $mdd = \frac{1}{sl-1}\sum_{i=1}^{sl-1}dd_i$
         - Liu, H. (2008). Dependency distance as a metric of language comprehension difficulty. Journal of Cognitive Science, 9(2), 159-191.
-    - mhd: Mean Hierarchical Distance, the average of all hierarchical distances in a sentence. The MHD of the sentence in the figure is (2+5+4+3+4+5+2+2+3+4+4+5+6+6)/14 = 3.93.  
+    - mhd: Mean Hierarchical Distance, the average of all hierarchical distances in a sentence. The MHD of the sentence in the figure is (1+4+3+2+3+4+1+1+2+3+3+4+5+5)/14 = 2.93.  
         - $mhd = \frac{1}{sl-1}\sum_{i=1}^{sl-1}hd_i$
         - Jing, Y., & Liu, H. (2015, August). Mean hierarchical distance augmenting mean dependency distance. In Proceedings of the third international conference on dependency linguistics (Depling 2015) (pp. 161-170).
     - mhdd: Mean Hierarchy Dependency Distance, the number of dependency relationships divided by the number of hierarchical levels in the sentence. The mhdd for the sentence in the figure is 14/6 = 2.33.  
@@ -390,3 +390,4 @@ eprint = {
 }
 }
 ``` 
+
