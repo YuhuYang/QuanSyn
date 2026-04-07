@@ -394,19 +394,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If our project has been helpful to you, please give it a star and cite our articles. We would be very grateful.
 
 ```
-@article{Yang25022025,
+@article{Yang03042025,
 author = {Mu Yang and Haitao Liu},
 title = {QuanSyn: A Package for Quantitative Syntax Analysis},
 journal = {Journal of Quantitative Linguistics},
-volume = {0},
-number = {0},
-pages = {1--18},
+volume = {32},
+number = {2},
+pages = {181--198},
 year = {2025},
 publisher = {Routledge},
 doi = {10.1080/09296174.2025.2471157},
 URL = {https://doi.org/10.1080/09296174.2025.2471157},
-eprint = {https://doi.org/10.1080/09296174.2025.2471157}
-}
+eprint = { https://doi.org/10.1080/09296174.2025.2471157}}
+
 ``` 
 
 
