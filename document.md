@@ -1,164 +1,173 @@
-### Depval Module
+# QuanSyn Documentation
+
+## Overview
+
+QuanSyn is a Python library for quantitative syntax analysis.
+
+Current modules:
+
+- `quansyn.depval`: dependency metrics, distributions, pvp, and treebank format conversion.
+- `quansyn.lingnet`: dependency/co-occurrence network edge extraction.
+- `quansyn.lawfitter`: fitting common quantitative linguistics laws.
+
+Package exports:
+
+- `__all__ = ["depval", "lawfitter", "lingnet"]`
+
+---
+
+## Installation
+
+```bash
+pip install quansyn
+```
+
+Dependencies include `conllu`, `numpy`, `pandas`, `scipy`, `scikit-learn`.
+
+---
+
+## API Reference
+
+### Module: `quansyn.depval`
 
 #### Class: `DepValAnalyzer`
 
-**Parameters:**
+Initialize analyzer from one of:
 
-- `treebank` (str) - Opened conllu format treebank.
+- text stream (`io.TextIOWrapper`) of CONLLU
+- parsed sentence list
+- raw CONLLU string
 
----
+```python
+DepValAnalyzer(treebank, cleaned=False, punct_deprels=None, root_deprels=None)
+```
 
-#### Method 1: `calculate_dep_metrics`
+Methods:
 
-**Parameters:**
+- `calculate_dep_metrics(metrics=None) -> Dict[str, List]`
+- `calculate_sent_metrics(metrics=None) -> Dict[str, List]`
+- `calculate_text_metrics(metrics=None) -> Dict[str, float]`
+- `calculate_distributions(metrics=None, normalize=False) -> Dict[str, Tuple[List, List]]`
+- `calculate_pvp(input=None, target='deprel', normalize=True) -> Dict[str, List[Tuple[str, float]]]`
 
-- `metrics` (List[str]) - The types of metrics to calculate, default is `['dd', 'hd', 'ddir', 'v']`.
+#### Function: `getDepValFeatures(treebank, normalize=True, punct_deprels=None, root_deprels=None)`
 
-**Return Value:**
+Returns:
 
-Returns a dictionary containing the results of various metrics:
+`(text_metrics, dep_df, sent_df, pvp_df, distribution_dict)`
 
-- `dd` (List) - Dependency distance.
-- `hd` (List) - Hierarchical distance.
-- `ddir` (List) - Dependency direction.
-- `v` (List) - Dynamic value.
+Notes:
 
----
+- `dep_df` includes `sent_id`.
+- `sent_df` includes `sent_id`.
 
-#### Method 2: `calculate_sent_metrics`
+#### Function: `analyze(treebank_path, out_path, normalize=True, punct_deprels=None, root_deprels=None)`
 
-**Parameters:**
+Batch process `.conllu` file(s) and save:
 
-- `metrics` (List[str]) - The metrics to calculate, default is `['mdd', 'mhd', 'mhdd', 'tdl', 'sl', 'mv', 'vk', 'tw', 'th', 'hi', 'hf']`.
+- `text_metrics.csv`
+- per-treebank `dep_metrics.csv`, `sent_metrics.csv`, `pvp.csv`
+- distribution files: `dd/hd/sl/v/tw/th/rd/deprel/pos_distribution.csv`
 
-**Return Value:**
+`pvp.csv` output in `analyze` is grouped by all `upos` with `deprel` as labels:
 
-Returns a dictionary containing the metrics for each sentence.
+- `upos`, `Items`, `act as a gov`, `act as a dep`
 
----
+#### Class: `Converter`
 
-#### Method 3: `calculate_text_metrics`
+```python
+Converter(treebank)
+```
 
-**Parameters:**
+Methods:
 
-- `metrics` (List[str]) - The metrics to calculate, default is `['mdd', 'mhd', 'mhdd', 'mtdl', 'msl', 'mv', 'vk', 'mtw', 'mth', 'hi', 'hf']`.
+- `to_conllu(style)` where `style in {'pmt','conll','mcdt'}`
+- `to_others(style)` where `style in {'conll','pmt','mcdt'}`
+- `style2style(style_from, style_to)`
+- `save(treebank, style, file_path)`
 
-**Return Value:**
+#### Function: `convert(treebank_path, out_path, style_from, style_to)`
 
-Returns a dictionary containing the metrics for the entire text.
-
----
-
-#### Method 4: `calculate_distributions`
-
-**Parameters:**
-
-- `metrics` (List[str]) - The distribution metrics to calculate, default is `['dd', 'hd', 'sl', 'v', 'tw', 'th', 'deprel', 'pos']`.
-- `normalize` (bool) - Whether to normalize the data, default is `False`.
-
-**Return Value:**
-
-Returns a dictionary containing the distribution data for each metric.
-
----
-
-Class: `Converter`
-
-**Parameters:**
-
-- `treebank` (str) - Opened treebank.
+Batch convert files in `treebank_path` and save into `out_path`.
 
 ---
 
-#### Method 1: `style2style`
-
-**Parameters:**
-
-- `from_style` (str) - Original format.
-- `to_style` (str) - Target format.
-
-**Return Value:**
-
-Returns the converted treebank.
-
----
-
-#### Method 2: `save`
-
-**Parameters:**
-
-- `treebank` (str) - Converted treebank.
-- `style` (str) - Target format.
-- `path` (str) - Save path.
-
-**Return Value:**
-
-None.
-
----
-
-### Lingnet Module
+### Module: `quansyn.lingnet`
 
 #### Class: `Network`
 
-**Parameters:**
+```python
+Network(treebank)
+```
 
-- `treebank` (str) - Opened treebank.
+Methods:
 
----
+- `getDeprel(lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+- `getBiGram(lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+- `mapWordId(contents)`
+- `getEdge(contents, mapping)`
 
-#### Method 1: `get_Deprel`
+#### Functions
 
-**Return Value:**
-
-Returns a list of dependency edges.
-
----
-
-#### Method 2: `get_Bigram`
-
-**Return Value:**
-
-Returns a list of co-occurrence edges.
+- `conllu2edge(treebank, mode='dependency', lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+- `load_edges(treebanks_path, output_path, mode='dependency', lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+  - supports both single file and directory input.
+- `fitPowerLaw(data) -> (a, b, r2)`
 
 ---
 
-#### Function: `conllu2edges`
+### Module: `quansyn.lawfitter`
 
-**Parameters:**
+Built-in law factories:
 
-- `treebank` (str) - Opened treebank.
-- `mode` (str) - Edge type, default is `dependency`.
+- `piotrovski_altmann_law(variant=None|'partial'|'reversiable')`
+- `zipf_law(variant=None)`
+- `menzerath_altmann_law(variant=None|'simplified form'|'complex form')`
+- `heap_law(variant=None)`
+- `brevity_law(variant=None)`
 
-**Return Value:**
+Core function:
 
-Returns a list of edges.
-
----
-
-#### Function: `fitPowerLaw`
-
-**Parameters:**
-
-- `data` (List) - Data, a degree sequence.
-
-**Return Value:**
-
-Returns the fitting results.
+- `fit(data, law_name=None, variant=None, customized_law=None) -> Dict[str, Any]`
+  - `data`: `[x_values, y_values]`
+  - returns `{'params': params, 'r^2': r2}`
 
 ---
 
-### Lawfitter Module
+## Minimal Examples
 
-#### Class: `fit`
+```python
+from quansyn.depval import DepValAnalyzer
 
-**Parameters:**
+analyzer = DepValAnalyzer(open('sample.conllu', encoding='utf-8'))
+print(analyzer.calculate_text_metrics())
+```
 
-- `data`: (tuple[List, list]) - Data, a tuple containing two lists.
-- `law_name`: str = None
-- `variant`: str = None
-- `customized_law`: function = None
+```python
+from quansyn.lingnet import conllu2edge
 
-**Return Value:**
+edges = conllu2edge(
+    open('sample.conllu', encoding='utf-8'),
+    mode='dependency',
+    lowercase=True,
+    ignore_punct=True,
+    weighted=False,
+    directed=False
+)
+print(edges[:5])
+```
 
-Returns the fitting results.
+```python
+from quansyn.lawfitter import fit
+
+result = fit(([1, 2, 3, 4], [10, 6, 4, 3]), law_name='zipf')
+print(result)
+```
+
+---
+
+## Notes
+
+- Punctuation dependencies are excluded by default in depval preprocessing.
+- Root-distance related metrics/distributions are supported: `rd`, `mrd`, `ndd`, and `rd` distribution.
+- For directory APIs (`analyze`, `convert`, `load_edges`), output path must be a directory.

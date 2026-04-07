@@ -1,166 +1,173 @@
+# QuanSyn 文档
 
-### Depval 模块
+## 概览
 
-#### 类名：`DepValAnalyzer`
+QuanSyn 是一个面向句法计量分析的 Python 库。
 
-**参数：**
+当前模块：
 
-- `treebank` (str) - 已经打开的 conllu 格式树库。
+- `quansyn.depval`：依存指标、分布、概率配价模式（PVP）与树库格式转换。
+- `quansyn.lingnet`：依存/共现网络边提取。
+- `quansyn.lawfitter`：常见计量语言学律的拟合。
 
----
+包导出：
 
-#### 方法 1：`calculate_dep_metrics`
-
-**参数：**
-
-- `metrics` (List[str]) - 需要计算的指标类型，默认为 `['dd', 'hd', 'ddir', 'v']`。
-
-**返回值：**
-
-返回一个字典，包含各个指标计算结果：
-
-- `dd` (List) - 依存距离。
-- `hd` (List) - 层级距离。
-- `ddir` (List) - 依存方向。
-- `v` (List) - 动态价。
+- `__all__ = ["depval", "lawfitter", "lingnet"]`
 
 ---
 
-#### 方法 2：`calculate_sent_metrics`
+## 安装
 
-**参数：**
+```bash
+pip install quansyn
+```
 
-- `metrics` (List[str]) - 需要计算的指标，默认为 `['mdd', 'mhd', 'mhdd', 'tdl', 'sl', 'mv', 'vk', 'tw', 'th', 'hi', 'hf']`。
-
-**返回值：**
-
-返回一个字典，包含每个句子的指标。
+依赖包含 `conllu`、`numpy`、`pandas`、`scipy`、`scikit-learn`。
 
 ---
 
-#### 方法 3：`calculate_text_metrics`
+## API 参考
 
-**参数：**
+### 模块：`quansyn.depval`
 
-- `metrics` (List[str]) - 需要计算的指标，默认为 `['mdd', 'mhd', 'mhdd', 'mtdl', 'msl', 'mv', 'vk', 'mtw', 'mth', 'hi', 'hf']`。
+#### 类：`DepValAnalyzer`
 
-**返回值：**
+支持以下输入初始化：
 
-返回一个字典，包含整个文本的指标结果。
+- CONLLU 文本流（`io.TextIOWrapper`）
+- 解析后的句子列表
+- 原始 CONLLU 字符串
 
----
+```python
+DepValAnalyzer(treebank, cleaned=False, punct_deprels=None, root_deprels=None)
+```
 
-#### 方法 4：`calculate_distributions`
+方法：
 
-**参数：**
+- `calculate_dep_metrics(metrics=None) -> Dict[str, List]`
+- `calculate_sent_metrics(metrics=None) -> Dict[str, List]`
+- `calculate_text_metrics(metrics=None) -> Dict[str, float]`
+- `calculate_distributions(metrics=None, normalize=False) -> Dict[str, Tuple[List, List]]`
+- `calculate_pvp(input=None, target='deprel', normalize=True) -> Dict[str, List[Tuple[str, float]]]`
 
-- `metrics` (List[str]) - 需要计算的分布度量，默认为 `['dd', 'hd', 'sl', 'v', 'tw', 'th', 'deprel', 'pos']`。
-- `normalize` (bool) - 是否进行归一化处理，默认为 `False`。
+#### 函数：`getDepValFeatures(treebank, normalize=True, punct_deprels=None, root_deprels=None)`
 
-**返回值：**
+返回：
 
-返回一个字典，包含每个指标的分布数据。
+`(text_metrics, dep_df, sent_df, pvp_df, distribution_dict)`
 
----
+说明：
 
-类名：`Converter`
+- `dep_df` 含 `sent_id` 列。
+- `sent_df` 含 `sent_id` 列。
 
-**参数：**
+#### 函数：`analyze(treebank_path, out_path, normalize=True, punct_deprels=None, root_deprels=None)`
 
-- `treebank` (str) - 已经打开的树库。
+批处理 `.conllu` 文件并输出：
 
----
+- `text_metrics.csv`
+- 每个树库的 `dep_metrics.csv`、`sent_metrics.csv`、`pvp.csv`
+- 分布文件：`dd/hd/sl/v/tw/th/rd/deprel/pos_distribution.csv`
 
-#### 方法 1：`style2style`
+`analyze` 输出的 `pvp.csv` 为“全部 `upos` × `deprel`”的长表，主要列为：
 
-**参数：**
+- `upos`, `Items`, `act as a gov`, `act as a dep`
 
-- `from_style` (str) - 原格式。
-- `to_style` (str) - 目标格式。
+#### 类：`Converter`
 
-**返回值：**
+```python
+Converter(treebank)
+```
 
-返回转换后的树库。
+方法：
 
----
+- `to_conllu(style)`，`style in {'pmt','conll','mcdt'}`
+- `to_others(style)`，`style in {'conll','pmt','mcdt'}`
+- `style2style(style_from, style_to)`
+- `save(treebank, style, file_path)`
 
-#### 方法 2：`save`
+#### 函数：`convert(treebank_path, out_path, style_from, style_to)`
 
-**参数：**
-
-- `treebank` (str) - 已经转换的树库。
-- `style` (str) - 目标格式。
-- `path` (str) - 保存路径。
-
-**返回值：**
-
-无。
-
----
-
-### Lingnet 模块
-
-#### 类名：`Network`
-
-**参数：**
-
-- `treebank` (str) - 已经打开的树库。
+批量转换目录中的树库文件并写入目标目录。
 
 ---
 
-#### 方法 1：`get_Deprel`
+### 模块：`quansyn.lingnet`
 
+#### 类：`Network`
 
-**返回值：**
+```python
+Network(treebank)
+```
 
-返回依存边列表。
+方法：
 
----
+- `getDeprel(lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+- `getBiGram(lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+- `mapWordId(contents)`
+- `getEdge(contents, mapping)`
 
-#### 方法 2：`get_Bigram`
+#### 函数
 
-**返回值：**
-
-返回同现边列表。
-
----
-
-#### 函数：`conllu2edges`
-
-**参数：**
-
-- `treebank` (str) - 已经打开的树库。
-- `mode` (str) - 边类型，默认为 `dependency`。
-
-**返回值：**
-
-返回边列表。
+- `conllu2edge(treebank, mode='dependency', lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+- `load_edges(treebanks_path, output_path, mode='dependency', lowercase=True, ignore_punct=True, weighted=False, directed=False)`
+  - 支持单文件或目录输入。
+- `fitPowerLaw(data) -> (a, b, r2)`
 
 ---
 
-#### 函数：`fitPowerLaw`
+### 模块：`quansyn.lawfitter`
 
-**参数：**
+内置律工厂：
 
-- `data` (List) - 数据，度序列。
+- `piotrovski_altmann_law(variant=None|'partial'|'reversiable')`
+- `zipf_law(variant=None)`
+- `menzerath_altmann_law(variant=None|'simplified form'|'complex form')`
+- `heap_law(variant=None)`
+- `brevity_law(variant=None)`
 
-**返回值：**
+核心函数：
 
-返回拟合结果。
+- `fit(data, law_name=None, variant=None, customized_law=None) -> Dict[str, Any]`
+  - `data` 形式：`[x_values, y_values]`
+  - 返回：`{'params': params, 'r^2': r2}`
 
 ---
 
-### Lawfitter 模块
+## 最小示例
 
-#### 类名：`fit`
+```python
+from quansyn.depval import DepValAnalyzer
 
-**参数：**
+analyzer = DepValAnalyzer(open('sample.conllu', encoding='utf-8'))
+print(analyzer.calculate_text_metrics())
+```
 
-- `data`: (tuple[List,list]) - 数据，包括两个列表的元组。
-- `law_name`：str = None
-- `variant`：str = None
-- `customized_law`：function = None
+```python
+from quansyn.lingnet import conllu2edge
 
-**返回值：**
+edges = conllu2edge(
+    open('sample.conllu', encoding='utf-8'),
+    mode='dependency',
+    lowercase=True,
+    ignore_punct=True,
+    weighted=False,
+    directed=False
+)
+print(edges[:5])
+```
 
-返回拟合结果。
+```python
+from quansyn.lawfitter import fit
+
+result = fit(([1, 2, 3, 4], [10, 6, 4, 3]), law_name='zipf')
+print(result)
+```
+
+---
+
+## 备注
+
+- depval 预处理默认忽略标点依存关系。
+- 已支持 root-distance 相关：`rd`、`mrd`、`ndd` 及 `rd` 分布。
+- 目录型接口（`analyze`、`convert`、`load_edges`）要求输出路径是目录。

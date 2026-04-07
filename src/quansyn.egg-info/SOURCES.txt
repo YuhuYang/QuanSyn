@@ -1,0 +1,14 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+src/quansyn/__init__.py
+src/quansyn/depval.py
+src/quansyn/lawfitter.py
+src/quansyn/lingnet.py
+src/quansyn.egg-info/PKG-INFO
+src/quansyn.egg-info/SOURCES.txt
+src/quansyn.egg-info/dependency_links.txt
+src/quansyn.egg-info/requires.txt
+src/quansyn.egg-info/top_level.txt
+tests/test_module.py
