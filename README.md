@@ -11,6 +11,7 @@
   
 - `Lawfitter` can quickly fit data to a target mathematical model and detect potential structural patterns in languages.
 
+It also be packed as applications with UIs(QuanSyn Mini/QuanSyn Studio,https://github.com/YuhuYang/QuanSyn_app/releases/tag/v0.0.1).
 ---
 
 ## Table of Contents
