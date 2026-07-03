@@ -10,6 +10,7 @@
 
 - `Lawfitter` 可以将数据快速拟合到目标数学模型，并发现语言中的潜在结构模式。
 
+QuanSyn不仅仅作为python lib存在，还有两个带有Ui的软件版本（https://github.com/YuhuYang/QuanSyn_app/releases/tag/v0.0.1）。
 ---
 
 ## 目录
